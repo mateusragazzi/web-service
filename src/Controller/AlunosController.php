@@ -16,15 +16,45 @@ class AlunosController extends AppController
      *
      * @return \Cake\Http\Response|null|void Renders view
      */
-    public function index()
+    public function index(/*$id = null*/)
     {   
-        $this->loadModel('Alunos');
-
-        $aluno = $this->Alunos->find('all')->contain(['SituacaoCadastro'])->where(['Alunos.situacao_id' => 1]);
+        $this->autoRender = false;
         
-        $alunos = $this->paginate($this->Alunos);
+        $alunos = $this->Alunos->find();
+        $json = array();
+        try{
+            // if($alunos->where(['Alunos.id' => $id] )){
+                if(!empty($this->request->getQuery('nome'))){
+                    $alunos->andWhere(['Alunos.nome' => $this->request->getQuery('nome')]);
+                }
+                if(!empty($this->request->getQuery('pagina'))){
+                    // $alunos->limit($this->request->getQuery('pagina'));
 
-        $this->set(compact('alunos'));
+                    //Deve usar aquela paradinha de paginação
+                }
+
+                // O isset estava dando erro kkkk
+                if($this->request->getQuery('limite') >= 0){
+                    $alunos->limit($this->request->getQuery('limite'));
+                }
+            
+                $json = json_encode($alunos);
+                
+            // }
+            // else{
+            //     throw new InvalidArgumentException('Não foi possível fazer a solicitação!');
+            // }
+
+        }catch(Exception $e){
+            $json = [
+                'msg' => 'Não foi encontrado aluno com essas informações :(',
+            ];
+            $this->response->statusCode(400);
+            // $this->response->body(json_encode(['msg' => $e->getMessage()]));
+
+        }
+      
+        return $this->response->withType('json')->withStringBody($json);
     }
 
     /**
