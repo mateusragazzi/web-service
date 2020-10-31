@@ -16,15 +16,45 @@ class AlunosController extends AppController
      *
      * @return \Cake\Http\Response|null|void Renders view
      */
-    public function index()
+    public function index($id = null)
     {   
-        $this->loadModel('Alunos');
-
-        $aluno = $this->Alunos->find('all')->contain(['SituacaoCadastro'])->where(['Alunos.situacao_id' => 1]);
+        $this->autoRender = false;
         
-        $alunos = $this->paginate($this->Alunos);
+        $alunos = $this->Alunos->find();
+        $json = array();
 
-        $this->set(compact('alunos'));
+        try{
+            $alunos->where(['Alunos.id' => $id])->first();
+            if(empty($alunos)){
+                throw new Exception('Usuário não foi encontrado.');
+            }
+            else{
+                if(!empty($this->request->getQuery('nome'))){
+                    $alunos->andWhere(['Alunos.nome' => $this->request->getQuery('nome')]);
+                }
+                if(!empty($this->request->getQuery('pagina'))){
+                    // $alunos->limit($this->request->getQuery('pagina'));
+
+                    //Deve usar aquela paradinha de paginação
+                }
+
+                // O isset estava dando erro kkkk
+                if($this->request->getQuery('limite') >= 0){
+                    $alunos->limit($this->request->getQuery('limite'));
+                }
+                $this->response->statusCode(200);
+                $json = $alunos;
+                
+            }
+
+        }catch(Exception $e){
+            $json = [
+                'msg' => 'Não foi encontrado aluno com essas informações :(',
+            ];
+            $this->response->statusCode(400);
+        }
+      
+        return $this->response->withType('json')->withStringBody(json_encode($json));
     }
 
     /**
@@ -98,13 +128,21 @@ class AlunosController extends AppController
      */
     public function delete($id = null)
     {
-        $this->request->allowMethod(['post', 'delete']);
-        $aluno = $this->Alunos->get($id);
-        if ($this->Alunos->delete($aluno)) {
-            $this->Flash->success(__('The aluno has been deleted.'));
-        } else {
-            $this->Flash->error(__('The aluno could not be deleted. Please, try again.'));
+        // $this->request->allowMethod(['post', 'delete']);
+        $aluno = $this->Alunos->find()->where(['Alunos.id' => $id])->first();
+
+        try{
+            if ($this->Alunos->delete($aluno)) {
+                $this->Flash->success(__('The aluno has been deleted.'));
+            } else {
+                throw new Exception('The aluno could not be deleted. Please, try again.');
+            }
+        }catch(Exception $e){
+            $json = [
+                ''
+            ]
         }
+        
 
         return $this->redirect(['action' => 'index']);
     }
