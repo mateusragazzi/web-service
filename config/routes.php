@@ -78,12 +78,6 @@ $routes->scope('/', function (RouteBuilder $builder) {
         ['controller' => 'Alunos', 'action' => 'add']
     );
 
-    $builder->post(
-        '/alunos',
-        ['controller' => 'Errors', 'action' => 'notFound']
-    )->setPatterns(['id' => '[0-9]+']);
-    
-
     /*************************/
     /*************************/
     /**                     **/
@@ -91,11 +85,6 @@ $routes->scope('/', function (RouteBuilder $builder) {
     /**                     **/
     /*************************/
     /*************************/
-
-    $builder->put(
-        '/alunos',
-        ['controller' => 'Errors', 'action' => 'notAllowed']
-    );
 
     $builder->put(
         '/alunos',
@@ -109,11 +98,6 @@ $routes->scope('/', function (RouteBuilder $builder) {
     /**                     **/
     /*************************/
     /*************************/
-
-    $builder->delete(
-        '/alunos',
-        ['controller' => 'Errors', 'action' => 'notAllowed']
-    );
 
     $builder->delete(
         '/alunos',

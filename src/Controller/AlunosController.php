@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Exception;
+
 /**
  * Alunos Controller
  *
@@ -140,7 +142,7 @@ class AlunosController extends AppController
         }catch(Exception $e){
             $json = [
                 ''
-            ]
+            ];
         }
         
 
