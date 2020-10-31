@@ -76,24 +76,36 @@ class AlunosController extends AppController
     }
 
     /**
-     * Add method
+     * 1ª Documentação - 31/10/2020, por Mateus Ragazzi
+     * Função que realiza o post do 
      *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
+     * @return \Cake\Http\Response $response resposta para o cliente, com status e dados.
      */
-    public function add()
+    public function add($parametroInvalido = null)
     {
-        $aluno = $this->Alunos->newEmptyEntity();
-        if ($this->request->is('post')) {
+        $this->request->allowMethod(['post']);
+
+        $response = $this->response->withType('application/json');
+        $this->viewBuilder()->setLayout('ajax');
+        $this->autoRender = false;
+        $statusCode = 405;
+        $json = "Método Inválido.";
+
+        if (empty($parametroInvalido)) {
+            $statusCode = 400;
+            $json = "Parâmetros inválidos.";
+
+            $aluno = $this->Alunos->newEmptyEntity();
             $aluno = $this->Alunos->patchEntity($aluno, $this->request->getData());
             if ($this->Alunos->save($aluno)) {
-                $this->Flash->success(__('The aluno has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
+                $json = $aluno->toArray();
+                $statusCode = 200;
+                $json = "Aluno salvo com sucesso!";
             }
-            $this->Flash->error(__('The aluno could not be saved. Please, try again.'));
         }
-        $situacaoCadastros = $this->Alunos->SituacaoCadastros->find('list', ['limit' => 200]);
-        $this->set(compact('aluno', 'situacaoCadastros'));
+
+        $response = $response->withStatus($statusCode);
+        return $response->withStringBody(json_encode($json));
     }
 
     /**

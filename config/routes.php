@@ -78,6 +78,11 @@ $routes->scope('/', function (RouteBuilder $builder) {
         ['controller' => 'Alunos', 'action' => 'add']
     );
 
+    $builder->post(
+        '/alunos/:id',
+        ['controller' => 'Alunos', 'action' => 'add']
+    )->setPatterns(['id' => '\d+'])->setPass(['id']);
+
     /*************************/
     /*************************/
     /**                     **/
