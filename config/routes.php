@@ -34,7 +34,7 @@ use Cake\Routing\RouteBuilder;
  * - InflectedRoute
  * - DashedRoute
  *
- * If no call is made to `Router::defaultRouteClass()`, the class used is
+ * If no call is made to `Router::defaultRou    teClass()`, the class used is
  * `Route` (`Cake\Routing\Route\Route`)
  *
  * Note that `Route` does not do any inflections on URLs which will result in
@@ -45,31 +45,81 @@ use Cake\Routing\RouteBuilder;
 $routes->setRouteClass(DashedRoute::class);
 
 $routes->scope('/', function (RouteBuilder $builder) {
-    /*
-     * Here, we are connecting '/' (base path) to a controller called 'Pages',
-     * its action called 'display', and we pass a param to select the view file
-     * to use (in this case, templates/Pages/home.php)...
-     */
-    $builder->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+    
+    /*************************/
+    /*************************/
+    /**                     **/
+    /**     MÉTODO GET      **/
+    /**                     **/
+    /*************************/
+    /*************************/
 
-    /*
-     * ...and connect the rest of 'Pages' controller's URLs.
-     */
-    $builder->connect('/pages/*', ['controller' => 'Pages', 'action' => 'display']);
+    $builder->get(
+        '/alunos',
+        ['controller' => 'Alunos', 'action' => 'index']
+    );
 
-    /*
-     * Connect catchall routes for all controllers.
-     *
-     * The `fallbacks` method is a shortcut for
-     *
-     * ```
-     * $builder->connect('/:controller', ['action' => 'index']);
-     * $builder->connect('/:controller/:action/*', []);
-     * ```
-     *
-     * You can remove these routes once you've connected the
-     * routes you want in your application.
-     */
+    $builder->get(
+        '/alunos/:id',
+        ['controller' => 'Alunos', 'action' => 'view']
+    )->setPatterns(['id' => '[0-9]+']);
+
+    
+    /*************************/
+    /*************************/
+    /**                     **/
+    /**     MÉTODO POST     **/
+    /**                     **/
+    /*************************/
+    /*************************/
+
+    $builder->post(
+        '/alunos',
+        ['controller' => 'Alunos', 'action' => 'add']
+    );
+
+    $builder->post(
+        '/alunos',
+        ['controller' => 'Errors', 'action' => 'notFound']
+    )->setPatterns(['id' => '[0-9]+']);
+    
+
+    /*************************/
+    /*************************/
+    /**                     **/
+    /**     MÉTODO PUT      **/
+    /**                     **/
+    /*************************/
+    /*************************/
+
+    $builder->put(
+        '/alunos',
+        ['controller' => 'Errors', 'action' => 'notAllowed']
+    );
+
+    $builder->put(
+        '/alunos',
+        ['controller' => 'Alunos', 'action' => 'edit']
+    )->setPatterns(['id' => '[0-9]+']);
+
+    /*************************/
+    /*************************/
+    /**                     **/
+    /**    MÉTODO DELETE    **/
+    /**                     **/
+    /*************************/
+    /*************************/
+
+    $builder->delete(
+        '/alunos',
+        ['controller' => 'Errors', 'action' => 'notAllowed']
+    );
+
+    $builder->delete(
+        '/alunos',
+        ['controller' => 'Alunos', 'action' => 'delete']
+    )->setPatterns(['id' => '[0-9]+']);
+
     $builder->fallbacks();
 });
 
