@@ -35,11 +35,7 @@ class Aluno extends Entity
         'nome' => true,
         'rga' => true,
         'curso' => true,
-        'situacao_id' => true,
-        'registrado_por' => true,
-        'modificado_por' => true,
+        'situacao' => true,
         'registrado_em' => true,
-        'modificado_em' => true,
-        'situacao_cadastro' => true,
     ];
 }

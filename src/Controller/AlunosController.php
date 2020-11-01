@@ -132,7 +132,7 @@ class AlunosController extends AppController
             $aluno = $this->Alunos->patchEntity($aluno, $this->request->getData());
             if ($this->Alunos->save($aluno)) {
                 $statusCode = 200;
-                $json = "Aluno editado com sucesso!";
+                $json = $aluno;
             }
         }
         $response = $response->withStatus($statusCode);
