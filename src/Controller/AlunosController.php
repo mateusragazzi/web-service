@@ -110,7 +110,7 @@ class AlunosController extends AppController
         $json = "ID Inválido.";
 
         if (!empty($id)) {
-            $statusCode = 400;               //CONFERIR ANTES DE SUBIR
+            $statusCode = 404;               //CONFERIR ANTES DE SUBIR
             $json = "Não foi possível modificar :(";
             $aluno = $this->Alunos->get($id, [
                 'contain' => [],
@@ -146,7 +146,7 @@ class AlunosController extends AppController
         $json = "ID Inválido.";
 
         if (!empty($id)) {
-            $statusCode = 400;               //CONFERIR ANTES DE SUBIR
+            $statusCode = 404;               //CONFERIR ANTES DE SUBIR
             $json = "Não foi possível excluir :(";
 
             $aluno = $this->Alunos->find()->where(['Alunos.id' => $id])->first();
