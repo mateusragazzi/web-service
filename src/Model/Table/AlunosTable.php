@@ -43,9 +43,6 @@ class AlunosTable extends Table
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
 
-        $this->belongsTo('SituacaoCadastros', [
-            'foreignKey' => 'situacao_id',
-        ]);
     }
 
     /**
@@ -78,20 +75,8 @@ class AlunosTable extends Table
             ->allowEmptyString('curso');
 
         $validator
-            ->integer('registrado_por')
-            ->allowEmptyString('registrado_por');
-
-        $validator
-            ->integer('modificado_por')
-            ->allowEmptyString('modificado_por');
-
-        $validator
             ->dateTime('registrado_em')
             ->allowEmptyDateTime('registrado_em');
-
-        $validator
-            ->dateTime('modificado_em')
-            ->allowEmptyDateTime('modificado_em');
 
         return $validator;
     }
@@ -105,8 +90,6 @@ class AlunosTable extends Table
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
-        $rules->add($rules->existsIn(['situacao_id'], 'SituacaoCadastros'), ['errorField' => 'situacao_id']);
-
         return $rules;
     }
 }

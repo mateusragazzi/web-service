@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Controller;
@@ -13,49 +14,63 @@ use Exception;
  */
 class AlunosController extends AppController
 {
+
+    public $paginate = [
+        'order' => [
+            'Alunos.nome' => 'asc'
+        ]
+    ];
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->loadComponent('Paginator');
+    }
+
     /**
      * Index method
      *
      * @return \Cake\Http\Response|null|void Renders view
      */
     public function index($id = null)
-    {   
+    {
+        $this->request->allowMethod('get');
+
+        $limite = 25;
         $response = $this->response->withType('application/json');
-        
+
         $alunos = $this->Alunos->find();
 
-        
         if (!empty($id)) {
-            $statusCode = 404;               //CONFERIR ANTES DE SUBIR
+            $statusCode = 404;
             $json = "Não foi possível encontrar usuário :(";
 
             $alunos->where(['Alunos.id' => $id])->first();
-            
-            
-        }
-        else{
-            $statusCode = 400;               //CONFERIR ANTES DE SUBIR
+        } else {
+            $statusCode = 400;
             $json = "Não foi possível encontrar com esses parâmetros!.";
 
-            $alunos->where(['Alunos.nome !=' =>  '']);
-            if(!empty($this->request->getQuery('nome'))){
-                $alunos->andWhere(['Alunos.nome' => $this->request->getQuery('nome')]);
+            if (!empty($this->request->getQuery('nome'))) {
+                $alunos->andWhere(['Alunos.nome LIKE' => '%' . $this->request->getQuery('nome') . '%']);
             }
 
-            if($this->request->getQuery('limite') >= 0){
+            if (($this->request->getQuery('limite')) >= 0) {
+                $limite = $this->request->getQuery('limite');
                 $alunos->limit($this->request->getQuery('limite'));
             }
 
-            // Ver como fazer a paginação com o Mateus
-
-            // if(!empty($this->request->getyQuery('pagina'))){
-            //     $alunos->paginate([$this->request->getyQuery('pagina')]);
-            // }
-
+            if (!empty($this->request->getQuery('pagina'))) {
+                $this->paginate['page'] = $this->request->getQuery('pagina');
+                $this->paginate['limit'] = $limite;
+            }
         }
-        if (!empty($alunos)) {
+
+        if ($alunos->count() > 0) {
             $statusCode = 200;
             $json = $alunos;
+            if ($alunos->count() > 1) {
+                $alunos = $this->paginate($alunos);
+            }
         }
 
         $response = $response->withStatus($statusCode);
@@ -87,7 +102,7 @@ class AlunosController extends AppController
             if ($this->Alunos->save($aluno)) {
                 $json = $aluno->toArray();
                 $statusCode = 200;
-                $json = "Aluno salvo com sucesso!";
+                $json = $aluno;
             }
         }
 
@@ -104,32 +119,26 @@ class AlunosController extends AppController
      */
     public function edit($id = null)
     {
+        $this->request->allowMethod('put');
         $response = $this->response->withType('application/json');
 
         $statusCode = 405;                   //CONFERIR ANTES DE SUBIR
-        $json = "ID Inválido.";
-
+        $json = "Erro ao procurar.";
         if (!empty($id)) {
             $statusCode = 404;               //CONFERIR ANTES DE SUBIR
             $json = "Não foi possível modificar :(";
-            $aluno = $this->Alunos->get($id, [
-                'contain' => [],
-            ]);
+            $aluno = $this->Alunos->get($id);
 
-            if ($this->request->is(['patch', 'post', 'put'])) {
-                if (!empty($aluno)) {
-                    $statusCode = 200;
-                    $json = "Aluno deletado com sucesso!";
-
-                    $aluno = $this->Alunos->patchEntity($aluno, $this->request->getData());
-                    $this->Alunos->save($aluno);
-                }
+            $aluno = $this->Alunos->patchEntity($aluno, $this->request->getData());
+            if ($this->Alunos->save($aluno)) {
+                $statusCode = 200;
+                $json = "Aluno editado com sucesso!";
             }
         }
         $response = $response->withStatus($statusCode);
         return $response->withStringBody(json_encode($json));
     }
-    
+
     /**
      * Delete method
      *
@@ -139,11 +148,11 @@ class AlunosController extends AppController
      */
     public function delete($id = null)
     {
-        $this->request->allowMethod(['post', 'delete']);
+        $this->request->allowMethod(['delete']);
         $response = $this->response->withType('application/json');
-        
+
         $statusCode = 405;                   //CONFERIR ANTES DE SUBIR
-        $json = "ID Inválido.";
+        $json = "Erro ao deletar.";
 
         if (!empty($id)) {
             $statusCode = 404;               //CONFERIR ANTES DE SUBIR
@@ -151,13 +160,15 @@ class AlunosController extends AppController
 
             $aluno = $this->Alunos->find()->where(['Alunos.id' => $id])->first();
             if (!empty($aluno)) {
-                $this->Alunos->delete($aluno);
-                $statusCode = 200;
-                $json = "Aluno deletado com sucesso!";
+                $aluno->situacao = 'Inativo';
+                if ($this->Alunos->save($aluno)) {
+
+                    $statusCode = 200;
+                    $json = $aluno;
+                }
             }
         }
         $response = $response->withStatus($statusCode);
         return $response->withStringBody(json_encode($json));
-      
     }
 }

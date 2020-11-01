@@ -61,8 +61,8 @@ $routes->scope('/', function (RouteBuilder $builder) {
 
     $builder->get(
         '/alunos/:id',
-        ['controller' => 'Alunos', 'action' => 'view']
-    )->setPatterns(['id' => '[0-9]+']);
+        ['controller' => 'Alunos', 'action' => 'index']
+    )->setPatterns(['id' => '\d+'])->setPass(['id']);
 
     
     /*************************/
@@ -90,11 +90,14 @@ $routes->scope('/', function (RouteBuilder $builder) {
     /**                     **/
     /*************************/
     /*************************/
-
     $builder->put(
         '/alunos',
         ['controller' => 'Alunos', 'action' => 'edit']
-    )->setPatterns(['id' => '[0-9]+']);
+    );
+    $builder->put(
+        '/alunos/:id',
+        ['controller' => 'Alunos', 'action' => 'edit']
+    )->setPatterns(['id' => '\d+'])->setPass(['id']);
 
     /*************************/
     /*************************/
@@ -103,11 +106,14 @@ $routes->scope('/', function (RouteBuilder $builder) {
     /**                     **/
     /*************************/
     /*************************/
-
     $builder->delete(
         '/alunos',
         ['controller' => 'Alunos', 'action' => 'delete']
-    )->setPatterns(['id' => '[0-9]+']);
+    );
+    $builder->delete(
+        '/alunos/:id',
+        ['controller' => 'Alunos', 'action' => 'delete']
+    )->setPatterns(['id' => '\d+'])->setPass(['id']);
 
     $builder->fallbacks();
 });
